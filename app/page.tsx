@@ -1,36 +1,46 @@
-"use client";
-
-import Standings from "@/components/Standings";
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="min-h-screen p-8">
-    <h1 className="text-3xl font-bold mb-8 text-center">My Fantasy Football League</h1>
+    <div>
+      {/* Navigation */}
+      <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
+        Navbar Component
+      </div>
 
-    {/* Top Bar */}
-    <div className="bg-gray-100 p-6 rounded-lg mb-6">
-      <h2 className="text-xl font-semibold mb-4 text-center">Latest Announcement</h2>
+      {/* Title */}
+      <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
+        Welcome to the League
+      </div>
+
+      {/* Commissioner Announcement */}
+      <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
+        CommissionerAnnouncement Component
+      </div>
+
+      {/* Main Layout Grid */}
+      <div style={{display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '10px', margin: '5px'}}>
+        
+        {/* Left Column - Standings */}
+        <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
+          Standings Component
+        </div>
+
+        {/* Middle Column - News */}
+        <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
+            News Component
+        </div>
+
+        {/* Right Column - Matchups */}
+      <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
+        Matchups Component
+      </div>
+      </div>
+
+      {/* Footer*/}
+      <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
+        Footer Component
+      </div>
+
     </div>
-
     
-    <div className="grid gap-6" style={{gridTemplateColumns: '1fr 2fr 1fr'}}>
-      {/* Left Column */}
-      <Standings leagueId="1124817707527573504"/>
-
-      {/* Middle Column */}
-      <div className="bg-gray-100 p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">News Feed</h2>
-        <p>This might be recent matchups or news.</p>
-        <p>Another line of placeholder text here.</p>
-      </div>
-
-      {/* Right Column */}
-      <div className="bg-gray-100 p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Upcoming Matches</h2>
-        <p>This could be upcoming games or league info.</p>
-        <p>More placeholder content for testing.</p>
-      </div>
-    </div>
-  </div>
   );
 }
