@@ -1,18 +1,12 @@
 import Footer from "@/components/Footer";
+import Navbar from "@/components/NavBar";
 
 
 export default function HomePage() {
   return (
     <div>
       {/* Navigation */}
-      <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
-        Navbar Component
-      </div>
-
-      {/* Title */}
-      <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
-        Welcome to the League
-      </div>
+      <Navbar />
 
       {/* Commissioner Announcement */}
       <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
