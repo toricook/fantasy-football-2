@@ -1,3 +1,6 @@
+import Footer from "@/components/Footer";
+
+
 export default function HomePage() {
   return (
     <div>
@@ -36,9 +39,7 @@ export default function HomePage() {
       </div>
 
       {/* Footer*/}
-      <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
-        Footer Component
-      </div>
+      <Footer />
 
     </div>
     
