@@ -205,6 +205,9 @@ export default function PreviousSeasonStandings({
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>Preseason Rankings</span>
+            <Badge variant="secondary" className="text-xs">
+              {seasonInfo?.season_type === 'pre' ? 'Preseason' : 'Offseason'}
+            </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">

@@ -1,6 +1,7 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/NavBar";
 import SmartStandings from './../components/SmartStandings';
+import SmartMatchups from "@/components/SmartMatchups";
 
 const leagueId = process.env.LEAGUE_ID!;
 const previousLeagueId = process.env.LAST_SEASON_LEAGUE_ID!;
@@ -31,9 +32,7 @@ export default function HomePage() {
         </div>
 
         {/* Right Column - Matchups */}
-      <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
-        Matchups Component
-      </div>
+        <SmartMatchups leagueId={leagueId} />
       </div>
 
       {/* Footer*/}
