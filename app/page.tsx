@@ -1,6 +1,9 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/NavBar";
+import SmartStandings from './../components/SmartStandings';
 
+const leagueId = process.env.LEAGUE_ID!;
+const previousLeagueId = process.env.LAST_SEASON_LEAGUE_ID!;
 
 export default function HomePage() {
   return (
@@ -17,9 +20,10 @@ export default function HomePage() {
       <div style={{display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '10px', margin: '5px'}}>
         
         {/* Left Column - Standings */}
-        <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
-          Standings Component
-        </div>
+        <SmartStandings 
+          leagueId={leagueId} 
+          previousSeasonLeagueId={previousLeagueId}
+        />
 
         {/* Middle Column - News */}
         <div style={{border: '1px solid black', padding: '10px', margin: '5px'}}>
