@@ -1,28 +1,44 @@
-'use client'
+import { defineConfig } from 'sanity'
+import { structureTool } from 'sanity/structure'
+import { visionTool } from '@sanity/vision'
+import { schema } from './schemas'
 
-/**
- * This configuration is used to for the Sanity Studio that’s mounted on the `\app\studio\[[...tool]]\page.tsx` route
- */
-
-import {visionTool} from '@sanity/vision'
-import {defineConfig} from 'sanity'
-import {structureTool} from 'sanity/structure'
-
-// Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
-import {apiVersion, dataset, projectId} from './sanity/env'
-import {schema} from './sanity/schemaTypes'
-import {structure} from './sanity/structure'
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET!
 
 export default defineConfig({
-  basePath: '/studio',
+  name: 'default',
+  title: 'Fantasy Football League',
   projectId,
   dataset,
-  // Add and edit the content schema in the './sanity/schemaTypes' folder
-  schema,
+  basePath: '/studio', // Add this line
   plugins: [
-    structureTool({structure}),
-    // Vision is for querying with GROQ from inside the Studio
-    // https://www.sanity.io/docs/the-vision-plugin
-    visionTool({defaultApiVersion: apiVersion}),
+    structureTool({
+      structure: (S) =>
+        S.list()
+          .title('Content')
+          .items([
+            S.listItem()
+              .title('Commissioner Announcements')
+              .child(
+                S.documentTypeList('announcement')
+                  .title('Announcements')
+                  .defaultOrdering([{ field: 'priority', direction: 'desc' }, { field: 'publishedAt', direction: 'desc' }])
+              ),
+            S.listItem()
+              .title('News Articles')
+              .child(
+                S.documentTypeList('newsArticle')
+                  .title('News Articles')
+                  .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+              ),
+            S.divider(),
+            ...S.documentTypeListItems().filter(
+              (listItem) => !['announcement', 'newsArticle'].includes(listItem.getId()!)
+            ),
+          ])
+    }),
+    visionTool(),
   ],
+  schema,
 })
