@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js required tables
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+// Our custom tables
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  name        String?
+  displayName String?   @map("display_name")
+  password    String?   // For credential-based auth
+  leagueId    String?   @map("league_id")
+  isActive    Boolean   @default(true) @map("is_active")
+  role        UserRole  @default(MEMBER)
+  joinedAt    DateTime  @default(now()) @map("joined_at")
+  deactivatedAt DateTime? @map("deactivated_at")
+  deactivatedBy String?   @map("deactivated_by")
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Our relations
+  league League? @relation(fields: [leagueId], references: [id])
+  memberLinks UserMemberLink[]
+  createdMembers LeagueMember[] @relation("MemberCreatedBy")
+  deactivatedUsers User[] @relation("DeactivatedBy")
+  deactivatedByUser User? @relation("DeactivatedBy", fields: [deactivatedBy], references: [id])
+
+  @@map("users")
+}
+
+model League {
+  id                      String   @id @default(cuid())
+  code                    String   @unique
+  name                    String
+  currentSleeperLeagueId  String   @map("current_sleeper_league_id")
+  historicalSleeperLeagueIds String[] @map("historical_sleeper_league_ids")
+  commissionerUserIds     String[] @map("commissioner_user_ids")
+  allowNewRegistrations   Boolean  @default(true) @map("allow_new_registrations")
+  requireCommissionerApproval Boolean @default(false) @map("require_commissioner_approval")
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  users User[]
+  members LeagueMember[]
+
+  @@map("leagues")
+}
+
+model LeagueMember {
+  id                String     @id @default(cuid())
+  leagueId          String     @map("league_id")
+  displayName       String     @map("display_name")
+  sleeperUserId     String?    @map("sleeper_user_id")
+  seasons           Season[]
+  source            MemberSource
+  isCurrentlyActive Boolean    @default(false) @map("is_currently_active")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  createdBy         String     @map("created_by")
+
+  league League @relation(fields: [leagueId], references: [id])
+  creator User @relation("MemberCreatedBy", fields: [createdBy], references: [id])
+  userLinks UserMemberLink[]
+
+  @@map("league_members")
+}
+
+model Season {
+  id              String  @id @default(cuid())
+  leagueMemberId  String  @map("league_member_id")
+  year            String
+  sleeperLeagueId String? @map("sleeper_league_id")
+  teamName        String? @map("team_name")
+  finalRank       Int?    @map("final_rank")
+  wins            Int?
+  losses          Int?
+  ties            Int?
+  totalPoints     Float?  @map("total_points")
+
+  member LeagueMember @relation(fields: [leagueMemberId], references: [id], onDelete: Cascade)
+
+  @@map("seasons")
+}
+
+model UserMemberLink {
+  id              String          @id @default(cuid())
+  userId          String          @map("user_id")
+  leagueMemberId  String          @map("league_member_id")
+  linkedAt        DateTime        @default(now()) @map("linked_at")
+  linkedBy        String          @map("linked_by")
+  approvedBy      String?         @map("approved_by")
+  status          LinkStatus      @default(PENDING)
+
+  user User @relation(fields: [userId], references: [id])
+  member LeagueMember @relation(fields: [leagueMemberId], references: [id])
+
+  @@unique([userId, leagueMemberId])
+  @@map("user_member_links")
+}
+
+// Enums
+enum UserRole {
+  MEMBER
+  COMMISSIONER
+}
+
+enum MemberSource {
+  SLEEPER
+  MANUAL
+}
+
+enum LinkStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
