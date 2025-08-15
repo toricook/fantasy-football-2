@@ -104,10 +104,10 @@ model LeagueMember {
   source            MemberSource
   isCurrentlyActive Boolean    @default(false) @map("is_currently_active")
   createdAt         DateTime   @default(now()) @map("created_at")
-  createdBy         String     @map("created_by")
+  createdBy         String?    @map("created_by")
 
   league League @relation(fields: [leagueId], references: [id])
-  creator User @relation("MemberCreatedBy", fields: [createdBy], references: [id])
+  creator User? @relation("MemberCreatedBy", fields: [createdBy], references: [id])
   userLinks UserMemberLink[]
 
   @@map("league_members")
@@ -127,6 +127,7 @@ model Season {
 
   member LeagueMember @relation(fields: [leagueMemberId], references: [id], onDelete: Cascade)
 
+  @@unique([leagueMemberId, year])
   @@map("seasons")
 }
 

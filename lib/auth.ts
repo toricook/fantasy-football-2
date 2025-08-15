@@ -33,7 +33,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null
         }
 
-        // Check password
+        // For now, we'll implement a simple password check
+        // In a real app, you'd hash passwords properly
         const isValidPassword = await bcrypt.compare(
           credentials.password as string,
           user.password || ""
@@ -52,9 +53,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.displayName || user.name,
+          // Store custom data that will be passed to JWT callback
           leagueId: user.leagueId,
           role: user.role,
-        }
+        } as any // Type assertion to bypass NextAuth's strict typing
       }
     })
   ],
