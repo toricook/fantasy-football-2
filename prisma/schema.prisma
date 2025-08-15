@@ -63,6 +63,13 @@ model User {
   joinedAt    DateTime  @default(now()) @map("joined_at")
   deactivatedAt DateTime? @map("deactivated_at")
   deactivatedBy String?   @map("deactivated_by")
+  
+  // New profile fields
+  birthdayMonth  Int?      @map("birthday_month") // 1-12
+  birthdayDay    Int?      @map("birthday_day")   // 1-31
+  favoriteTeam   String?   @map("favorite_team")  // Any team name, not restricted
+  bio            String?   // User bio/description - can be longer text
+  updatedAt      DateTime? @updatedAt @map("updated_at")
 
   // NextAuth relations
   accounts Account[]

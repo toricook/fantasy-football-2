@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -36,7 +37,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
               <Link
@@ -52,10 +53,16 @@ export default function Navbar() {
                 {item.label}
               </Link>
             ))}
+            
+            {/* Profile Dropdown - Desktop */}
+            <div className="ml-2">
+              <ProfileDropdown />
+            </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          {/* Mobile Menu Button + Profile */}
+          <div className="md:hidden flex items-center space-x-2">
+            <ProfileDropdown />
             <button 
               onClick={toggleMobileMenu}
               className="text-muted-foreground hover:text-foreground p-2 transition-colors"

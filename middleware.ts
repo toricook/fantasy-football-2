@@ -9,12 +9,20 @@ const publicRoutes = [
   '/api/auth',
 ]
 
-// Routes that require authentication
+// Routes that require authentication but don't require a claimed profile
+const authOnlyRoutes = [
+  '/claim-profile',
+  '/api/claim-profile',
+]
+
+// Routes that require both authentication AND a claimed profile
 const protectedRoutes = [
   '/',
   '/news',
   '/members', 
   '/archive',
+  '/profile',
+  '/api/profile',
 ]
 
 export default async function middleware(request: NextRequest) {
@@ -41,7 +49,24 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // User is authenticated and is a league member - allow access
+  // Allow auth-only routes (like claim-profile) without checking for claimed profile
+  if (authOnlyRoutes.some(route => pathname.startsWith(route))) {
+    return NextResponse.next()
+  }
+
+  // For protected routes, check if user has claimed a profile using session data
+  if (protectedRoutes.some(route => pathname.startsWith(route))) {
+    // Check if user has claimed a profile (stored in session)
+    const hasClaimedProfile = !!session.user.claimedMemberId
+    
+    if (!hasClaimedProfile) {
+      // User needs to claim a profile first
+      const claimUrl = new URL('/claim-profile', request.url)
+      return NextResponse.redirect(claimUrl)
+    }
+  }
+
+  // User is authenticated and has claimed profile - allow access
   return NextResponse.next()
 }
 

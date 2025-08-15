@@ -5,6 +5,9 @@ import SmartMatchups from "@/components/SmartMatchups";
 import Announcements from "@/components/Announcements";
 import News from "@/components/News";
 import { client } from '@/lib/sanity';
+import { Debug } from "@prisma/client/runtime/library";
+import DebugSession from "@/components/DebugSession";
+import { auth } from "@/lib/auth";
 
 const leagueId = process.env.LEAGUE_ID!;
 const previousLeagueId = process.env.LAST_SEASON_LEAGUE_ID!;
@@ -58,7 +61,17 @@ async function getRecentNews() {
 export default async function HomePage() {
   console.log('=== HOMEPAGE SERVER RENDER ===');
   console.log('Fetching content...');
-  
+
+  // ADD THIS DEBUG SECTION
+  const session = await auth();
+  console.log('SESSION DEBUG:', {
+    userId: session?.user?.id,
+    email: session?.user?.email,
+    leagueId: session?.user?.leagueId,
+    claimedMemberId: session?.user?.claimedMemberId,
+    claimedMemberName: session?.user?.claimedMemberName,
+    role: session?.user?.role
+  });
   const [announcements, recentNews] = await Promise.all([
     getAnnouncements(),
     getRecentNews()
@@ -71,6 +84,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
+
       <Navbar />
 
       {/* Commissioner Announcements - Full Width */}

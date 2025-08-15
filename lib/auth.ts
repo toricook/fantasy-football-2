@@ -25,7 +25,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: credentials.email as string
           },
           include: {
-            league: true
+            league: true,
+            memberLinks: {
+              where: { status: 'APPROVED' },
+              include: { member: true }
+            }
           }
         })
 
@@ -49,6 +53,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error("Account has been deactivated")
         }
 
+        // Get the claimed member profile if it exists
+        const claimedMember = user.memberLinks[0]?.member || null
+
         return {
           id: user.id,
           email: user.email,
@@ -56,6 +63,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // Store custom data that will be passed to JWT callback
           leagueId: user.leagueId,
           role: user.role,
+          claimedMemberId: claimedMember?.id || null,
+          claimedMemberName: claimedMember?.displayName || null,
         } as any // Type assertion to bypass NextAuth's strict typing
       }
     })
@@ -68,6 +77,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.leagueId = user.leagueId
         token.role = user.role
+        token.claimedMemberId = user.claimedMemberId
+        token.claimedMemberName = user.claimedMemberName
       }
       return token
     },
@@ -76,6 +87,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.sub!
         session.user.leagueId = token.leagueId as string
         session.user.role = token.role as string
+        session.user.claimedMemberId = token.claimedMemberId as string
+        session.user.claimedMemberName = token.claimedMemberName as string
       }
       return session
     }
