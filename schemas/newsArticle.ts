@@ -22,13 +22,6 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'excerpt',
-      title: 'Excerpt',
-      type: 'text',
-      description: 'Brief summary for previews',
-      validation: (Rule) => Rule.max(200),
-    }),
-    defineField({
       name: 'featuredImage',
       title: 'Featured Image',
       type: 'image',
@@ -93,28 +86,23 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'category',
-      title: 'Category',
+      name: 'season',
+      title: 'Season',
       type: 'string',
+      description: 'Which fantasy season this article belongs to (e.g., "2025", "2024")',
+      validation: (Rule) => Rule.required(),
+      initialValue: () => new Date().getFullYear().toString(),
       options: {
         list: [
-          { title: 'League News', value: 'league' },
-          { title: 'Trade Alert', value: 'trade' },
-          { title: 'Injury Report', value: 'injury' },
-          { title: 'Waiver Wire', value: 'waiver' },
-          { title: 'Fantasy Tips', value: 'tips' },
-          { title: 'Other', value: 'other' },
-        ],
-      },
-      initialValue: 'league',
-    }),
-    defineField({
-      name: 'tags',
-      title: 'Tags',
-      type: 'array',
-      of: [{ type: 'string' }],
-      options: {
-        layout: 'tags',
+          { title: '2025', value: '2025' },
+          { title: '2024', value: '2024' },
+          { title: '2023', value: '2023' },
+          { title: '2022', value: '2022' },
+          { title: '2021', value: '2021' },
+          { title: '2020', value: '2020' },
+          { title: '2019', value: '2019' },
+          { title: '2018', value: '2018' },
+        ].reverse(), // Most recent first
       },
     }),
     defineField({
@@ -141,20 +129,28 @@ export default defineType({
     select: {
       title: 'title',
       author: 'author',
-      category: 'category',
+      season: 'season',
       isPublished: 'isPublished',
       media: 'featuredImage',
     },
     prepare(selection) {
-      const { title, author, category, isPublished, media } = selection
+      const { title, author, season, isPublished, media } = selection
       return {
         title: title,
-        subtitle: `${category} • ${author} • ${isPublished ? '✅ Published' : '❌ Draft'}`,
+        subtitle: `${season} • ${author} • ${isPublished ? '✅ Published' : '❌ Draft'}`,
         media: media,
       }
     },
   },
   orderings: [
+    {
+      title: 'Season & Date (Newest first)',
+      name: 'seasonDateDesc',
+      by: [
+        { field: 'season', direction: 'desc' },
+        { field: 'publishedAt', direction: 'desc' }
+      ],
+    },
     {
       title: 'Newest first',
       name: 'publishedAtDesc',

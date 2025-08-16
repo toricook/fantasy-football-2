@@ -2,19 +2,9 @@
 
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { urlFor, type NewsArticle } from '@/lib/sanity';
 import { Calendar, ArrowRight, Newspaper } from 'lucide-react';
-
-const categoryColors = {
-  league: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  trade: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  injury: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  waiver: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  tips: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  other: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
-};
 
 interface NewsProps {
   articles: NewsArticle[];
@@ -72,11 +62,6 @@ export default function News({ articles, showViewAll = true }: NewsProps) {
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-2 left-2">
-                  <Badge className={categoryColors[article.category as keyof typeof categoryColors]}>
-                    {article.category}
-                  </Badge>
-                </div>
               </div>
             )}
 
@@ -91,23 +76,7 @@ export default function News({ articles, showViewAll = true }: NewsProps) {
                       {article.title}
                     </h3>
                   </Link>
-                  
-                  {article.excerpt && (
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                      {article.excerpt}
-                    </p>
-                  )}
                 </div>
-                
-                {/* Show category badge for non-featured articles */}
-                {index > 0 && (
-                  <Badge 
-                    variant="outline" 
-                    className={`text-xs flex-shrink-0 ${categoryColors[article.category as keyof typeof categoryColors]}`}
-                  >
-                    {article.category}
-                  </Badge>
-                )}
               </div>
 
               <div className="flex items-center gap-2 text-xs text-muted-foreground">

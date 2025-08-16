@@ -33,8 +33,9 @@ async function getAnnouncements() {
 
 async function getRecentNews() {
   try {
+    const currentSeason = new Date().getFullYear().toString();
     const news = await client.fetch(`
-      *[_type == "newsArticle" && isPublished == true] | order(publishedAt desc) [0...8] {
+      *[_type == "newsArticle" && isPublished == true && season == $currentSeason] | order(publishedAt desc) [0...8] {
         _id,
         title,
         slug,
@@ -42,15 +43,18 @@ async function getRecentNews() {
         featuredImage,
         category,
         author,
-        publishedAt
+        publishedAt,
+        season
       }
-    `)
-    console.log('=== NEWS FETCH ===');
+    `, { currentSeason })
+    
+    console.log('=== CURRENT SEASON NEWS FETCH ===');
+    console.log('Season:', currentSeason);
     console.log('Count:', news.length);
     console.log('Data:', news);
     return news;
   } catch (error) {
-    console.error('Error fetching news:', error);
+    console.error('Error fetching current season news:', error);
     return [];
   }
 }
@@ -71,7 +75,6 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-
       <Navbar />
 
       {/* Commissioner Announcements - Full Width */}

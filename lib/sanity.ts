@@ -1,4 +1,3 @@
-// lib/sanity.ts
 import { createClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
 
@@ -30,13 +29,11 @@ export interface NewsArticle {
   _id: string
   title: string
   slug: { current: string }
-  excerpt?: string
   featuredImage?: any
   content: any[]
-  category: string
-  tags?: string[]
   author: string
   publishedAt: string
+  season: string
 }
 
 // GROQ queries
@@ -68,25 +65,35 @@ export const queries = {
       _id,
       title,
       slug,
-      excerpt,
       featuredImage,
-      category,
-      tags,
       author,
       publishedAt,
+      season,
       content
     }
   `,
   
-  recentNews: `
-    *[_type == "newsArticle" && isPublished == true] | order(publishedAt desc) [0...5] {
+  currentSeasonNews: `
+    *[_type == "newsArticle" && isPublished == true && season == $currentSeason] | order(publishedAt desc) [0...5] {
       _id,
       title,
       slug,
-      excerpt,
       featuredImage,
-      category,
-      publishedAt
+      publishedAt,
+      season
+    }
+  `,
+  
+  seasonNews: `
+    *[_type == "newsArticle" && isPublished == true && season == $season] | order(publishedAt desc) {
+      _id,
+      title,
+      slug,
+      featuredImage,
+      author,
+      publishedAt,
+      season,
+      content
     }
   `,
   
@@ -95,13 +102,11 @@ export const queries = {
       _id,
       title,
       slug,
-      excerpt,
       featuredImage,
       content,
-      category,
-      tags,
       author,
-      publishedAt
+      publishedAt,
+      season
     }
   `
 }
@@ -112,22 +117,16 @@ export async function getAnnouncements() {
 }
 
 export async function getRecentNews(limit = 5) {
-  const query = `
-    *[_type == "newsArticle" && isPublished == true] | order(publishedAt desc) [0...${limit}] {
-      _id,
-      title,
-      slug,
-      excerpt,
-      featuredImage,
-      category,
-      publishedAt
-    }
-  `
-  return await client.fetch(query)
+  const currentSeason = new Date().getFullYear().toString();
+  return await client.fetch(queries.currentSeasonNews, { currentSeason })
 }
 
 export async function getAllNews() {
   return await client.fetch(queries.newsArticles)
+}
+
+export async function getSeasonNews(season: string) {
+  return await client.fetch(queries.seasonNews, { season })
 }
 
 export async function getNewsArticle(slug: string) {
