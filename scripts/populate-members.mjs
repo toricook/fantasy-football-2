@@ -77,11 +77,15 @@ async function populateHistoricalMembers() {
   }
 }
 
+
+// Updated populateFromSleeperLeague function with proper division handling
+
 async function populateFromSleeperLeague(leagueId, sleeperLeagueId, year, isCurrentSeason = false) {
   try {
     console.log(`\n📥 Fetching data for ${year} season (${sleeperLeagueId})...`)
     
-    const [users, rosters, standings] = await Promise.all([
+    const [league, users, rosters, standings] = await Promise.all([
+      sleeper.getLeague(sleeperLeagueId),
       sleeper.getUsersByLeague(sleeperLeagueId),
       sleeper.getRostersByLeague(sleeperLeagueId),
       sleeper.getLeagueStandings(sleeperLeagueId)
@@ -89,9 +93,42 @@ async function populateFromSleeperLeague(leagueId, sleeperLeagueId, year, isCurr
 
     console.log(`   Found ${users.length} users for ${year}`)
 
+    // Extract division names from league metadata (where they're actually stored)
+    const divisionNames = {};
+    let hasDivisions = false;
+    
+    // Look for division_1, division_2, etc. in the league metadata
+    if (league.metadata) {
+      for (let i = 1; i <= 10; i++) { // Check up to 10 divisions
+        const divisionKey = `division_${i}`;
+        if (league.metadata[divisionKey]) {
+          divisionNames[i] = league.metadata[divisionKey];
+          hasDivisions = true;
+        }
+      }
+    }
+    
+    // Also check if there's a divisions count in settings
+    if (league.settings && league.settings.divisions) {
+      console.log(`   📊 League has ${league.settings.divisions} divisions configured`);
+    }
+
+    if (hasDivisions) {
+      console.log(`   🏆 Found divisions:`, divisionNames);
+    } else {
+      console.log(`   ⚠️  No divisions found in league settings`);
+    }
+
     for (const user of users) {
       const roster = rosters.find(r => r.owner_id === user.user_id)
       const standing = standings.find(s => s.roster_id === roster?.roster_id)
+      
+      // Get division for this user's roster from standings
+      let division = null;
+      if (standing && standing.settings && standing.settings.division && hasDivisions) {
+        const divisionNumber = standing.settings.division;
+        division = divisionNames[divisionNumber] || `Division ${divisionNumber}`;
+      }
       
       // Check if member already exists
       let member = await prisma.leagueMember.findFirst({
@@ -118,6 +155,7 @@ async function populateFromSleeperLeague(leagueId, sleeperLeagueId, year, isCurr
             losses: standing?.settings.losses || null,
             ties: standing?.settings.ties || null,
             totalPoints: standing?.settings.fpts_total || null,
+            division: division, // Add real division info
           },
           create: {
             leagueMemberId: member.id,
@@ -129,6 +167,7 @@ async function populateFromSleeperLeague(leagueId, sleeperLeagueId, year, isCurr
             losses: standing?.settings.losses || null,
             ties: standing?.settings.ties || null,
             totalPoints: standing?.settings.fpts_total || null,
+            division: division, // Add real division info
           }
         })
         
@@ -140,13 +179,13 @@ async function populateFromSleeperLeague(leagueId, sleeperLeagueId, year, isCurr
           })
         }
         
-        console.log(`   ✏️  Updated ${user.display_name || user.username} for ${year}`)
+        console.log(`   ✏️  Updated ${user.display_name || user.username} for ${year}${division ? ` (${division})` : ''}`)
       } else {
-        // Create new member with their user ID for easy system access
+        // Create new member
         const systemUser = await prisma.user.findFirst({
           where: { role: 'COMMISSIONER' }
         })
-        const createdBy = systemUser?.id || null // Use null instead of "system"
+        const createdBy = systemUser?.id || null
 
         member = await prisma.leagueMember.create({
           data: {
@@ -165,11 +204,12 @@ async function populateFromSleeperLeague(leagueId, sleeperLeagueId, year, isCurr
                 losses: standing?.settings.losses || null,
                 ties: standing?.settings.ties || null,
                 totalPoints: standing?.settings.fpts_total || null,
+                division: division, // Add real division info
               }
             }
           }
         })
-        console.log(`   ➕ Added ${user.display_name || user.username} for ${year}`)
+        console.log(`   ➕ Added ${user.display_name || user.username} for ${year}${division ? ` (${division})` : ''}`)
       }
     }
   } catch (error) {
@@ -227,6 +267,7 @@ async function addManualSeason(leagueId, year, seasonData) {
             losses: teamData.losses || null,
             ties: teamData.ties || null,
             totalPoints: teamData.pointsFor || null,
+            division: teamData.division || null, // Add division from JSON
           },
           create: {
             leagueMemberId: member.id,
@@ -237,9 +278,10 @@ async function addManualSeason(leagueId, year, seasonData) {
             losses: teamData.losses || null,
             ties: teamData.ties || null,
             totalPoints: teamData.pointsFor || null,
+            division: teamData.division || null, // Add division from JSON
           }
         })
-        console.log(`   ✏️  Updated ${cleanOwnerName} (${teamData.teamName}) for ${year}`)
+        console.log(`   ✏️  Updated ${cleanOwnerName} (${teamData.teamName}) for ${year}${teamData.division ? ` - ${teamData.division}` : ''}`)
       } else {
         // Create new member for this owner
         member = await prisma.leagueMember.create({
@@ -257,11 +299,12 @@ async function addManualSeason(leagueId, year, seasonData) {
                 losses: teamData.losses || null,
                 ties: teamData.ties || null,
                 totalPoints: teamData.pointsFor || null,
+                division: teamData.division || null, // Add division from JSON
               }
             }
           }
         })
-        console.log(`   ➕ Added ${cleanOwnerName} (${teamData.teamName}) for ${year}`)
+        console.log(`   ➕ Added ${cleanOwnerName} (${teamData.teamName}) for ${year}${teamData.division ? ` - ${teamData.division}` : ''}`)
       }
     }
     
