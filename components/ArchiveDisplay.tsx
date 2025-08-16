@@ -7,7 +7,7 @@ import { Trophy, Calendar, Crown, Medal, Target } from "lucide-react";
 
 interface SeasonTeam {
   year: string;
-  memberName: string;
+  memberNames: string[]; // Changed to array for co-owners
   teamName: string | null;
   wins: number | null;
   losses: number | null;
@@ -58,6 +58,17 @@ function getRankIcon(rank: number | null) {
   return null;
 }
 
+function formatOwners(memberNames: string[]): string {
+  if (memberNames.length === 1) {
+    return memberNames[0];
+  }
+  if (memberNames.length === 2) {
+    return memberNames.join(' & ');
+  }
+  // For 3+ owners (rare case)
+  return memberNames.slice(0, -1).join(', ') + ' & ' + memberNames[memberNames.length - 1];
+}
+
 function StandingsTable({ teams, title }: { teams: SeasonTeam[]; title?: string }) {
   return (
     <div className="space-y-2">
@@ -68,16 +79,16 @@ function StandingsTable({ teams, title }: { teams: SeasonTeam[]; title?: string 
         <TableHeader>
           <TableRow>
             <TableHead className="w-16">Rank</TableHead>
-            <TableHead>Team</TableHead>
-            <TableHead>Owner</TableHead>
-            <TableHead className="text-center">Record</TableHead>
-            <TableHead className="text-right">Points</TableHead>
+            <TableHead className="w-[300px]">Team</TableHead>
+            <TableHead className="w-[250px]">Owner(s)</TableHead>
+            <TableHead className="w-20 text-center">Record</TableHead>
+            <TableHead className="w-24 text-right">Points</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {teams.map((team, index) => (
             <TableRow 
-              key={`${team.memberName}-${index}`}
+              key={`${team.memberNames.join('-')}-${index}`}
               className={team.finalRank === 1 ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}
             >
               <TableCell>
@@ -99,7 +110,14 @@ function StandingsTable({ teams, title }: { teams: SeasonTeam[]; title?: string 
               <TableCell>
                 <div className="flex items-center gap-2">
                   {team.finalRank === 1 && <Crown className="w-4 h-4 text-yellow-600" />}
-                  {team.memberName}
+                  <span>
+                    {formatOwners(team.memberNames)}
+                  </span>
+                  {team.memberNames.length > 1 && (
+                    <Badge variant="outline" className="text-xs">
+                      Co-owned
+                    </Badge>
+                  )}
                 </div>
               </TableCell>
               <TableCell className="text-center">
@@ -144,7 +162,7 @@ function YearCard({ yearData }: { yearData: YearlyData }) {
                 Champion
               </div>
               <div className="text-sm text-muted-foreground">
-                {yearData.champion.memberName}
+                {formatOwners(yearData.champion.memberNames)}
               </div>
               <div className="text-xs text-muted-foreground">
                 {formatRecord(yearData.champion.wins, yearData.champion.losses, yearData.champion.ties)} • {formatPoints(yearData.champion.totalPoints)} pts

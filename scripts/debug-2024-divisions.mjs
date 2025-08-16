@@ -9,7 +9,7 @@ export const revalidate = 300; // Cache for 5 minutes
 
 interface SeasonTeam {
   year: string;
-  memberNames: string[]; // Changed from memberName to memberNames array
+  memberName: string;
   teamName: string | null;
   wins: number | null;
   losses: number | null;
@@ -86,62 +86,32 @@ async function getArchiveData(): Promise<YearlyData[]> {
         division: season.division
       });
       return acc;
-    }, {} as { [year: string]: any[] });
+    }, {} as { [year: string]: SeasonTeam[] });
 
     // Convert to yearly data format
-    const yearlyData: YearlyData[] = Object.entries(seasonsByYear).map(([year, rawTeams]) => {
-      // First, group teams by their season data to combine co-owners
-      const teamMap = new Map<string, SeasonTeam>();
+    const yearlyData: YearlyData[] = Object.entries(seasonsByYear).map(([year, teams]) => {
+      // Filter out incomplete teams first
+      const completeTeams = teams.filter(team => 
+        team.finalRank !== null && team.wins !== null
+      );
       
-      rawTeams.forEach(team => {
-        // Skip incomplete teams
-        if (team.finalRank === null || team.wins === null) {
-          return;
-        }
-        
-        // Create a unique key based on season performance data
-        const teamKey = `${team.finalRank}-${team.wins}-${team.losses}-${team.totalPoints}-${team.division}`;
-        
-        if (teamMap.has(teamKey)) {
-          // Add this member as a co-owner
-          const existingTeam = teamMap.get(teamKey)!;
-          existingTeam.memberNames.push(team.memberName);
-        } else {
-          // Create new team entry
-          teamMap.set(teamKey, {
-            year: team.year,
-            memberNames: [team.memberName],
-            teamName: team.teamName,
-            wins: team.wins,
-            losses: team.losses,
-            ties: team.ties,
-            totalPoints: team.totalPoints,
-            finalRank: team.finalRank,
-            division: team.division
-          });
-        }
-      });
-      
-      // Convert map to array of unique teams
-      const uniqueTeams = Array.from(teamMap.values());
-      
-      // Check if any teams have divisions
-      const hasDivisions = uniqueTeams.some(team => 
+      // Then check if any of the complete teams have divisions
+      const hasDivisions = completeTeams.some(team => 
         team.division && 
         team.division.trim() !== '' && 
         team.division.toLowerCase() !== 'unknown'
       );
       
-      console.log(`${year}: uniqueTeams = ${uniqueTeams.length}, hasDivisions = ${hasDivisions}`);
-      console.log(`${year}: teams:`, uniqueTeams.map(t => `${t.memberNames.join('/')} (${t.finalRank}): "${t.division}"`));
+      console.log(`${year}: completeTeams = ${completeTeams.length}, hasDivisions = ${hasDivisions}`);
+      console.log(`${year}: division values:`, completeTeams.map(t => `${t.memberName}: "${t.division}"`));
       
       let divisions: { [divisionName: string]: SeasonTeam[] } | null = null;
 
       if (hasDivisions) {
-        // Group teams by division
+        // Group complete teams by division
         divisions = {};
         
-        uniqueTeams.forEach(team => {
+        completeTeams.forEach(team => {
           if (team.division && team.division.trim() !== '') {
             const divisionName = team.division.trim();
             
@@ -173,8 +143,8 @@ async function getArchiveData(): Promise<YearlyData[]> {
         }
       }
 
-      // Sort all teams by final rank for champion detection and non-division display
-      const sortedTeams = [...uniqueTeams].sort((a, b) => {
+      // Sort all complete teams by final rank for champion detection and non-division display
+      const sortedTeams = [...completeTeams].sort((a, b) => {
         if (a.finalRank && b.finalRank) {
           return a.finalRank - b.finalRank;
         }
@@ -189,9 +159,9 @@ async function getArchiveData(): Promise<YearlyData[]> {
       return {
         year,
         leagueName: historicalData.manualSeasons?.[year]?.leagueName || undefined,
-        hasDivisions: divisions !== null,
+        hasDivisions: divisions !== null, // Update this based on whether we actually have divisions
         divisions,
-        teams: sortedTeams,
+        teams: sortedTeams, // Use sorted complete teams
         champion
       };
     });
