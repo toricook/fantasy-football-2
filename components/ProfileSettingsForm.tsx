@@ -187,22 +187,6 @@ export default function ProfileSettingsForm({ user }: ProfileSettingsFormProps) 
                 </Alert>
               )}
 
-              {/* Display Name */}
-              <div className="space-y-2">
-                <Label htmlFor="displayName">Display Name</Label>
-                <Input
-                  id="displayName"
-                  name="displayName"
-                  type="text"
-                  value={formData.displayName}
-                  onChange={handleInputChange}
-                  placeholder="How you want to appear in the league"
-                  disabled={loading}
-                />
-                <p className="text-xs text-muted-foreground">
-                  This is how other league members will see your name.
-                </p>
-              </div>
 
               {/* Birthday */}
               <div className="space-y-4">
