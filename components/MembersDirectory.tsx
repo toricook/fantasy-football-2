@@ -2,7 +2,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Trophy, Calendar, Target } from "lucide-react";
+import { Users, Trophy, Calendar, User, Target } from "lucide-react";
+
+interface Award {
+  id: string;
+  name: string;
+  icon: string;
+  season: string;
+}
 
 interface Season {
   year: string;
@@ -19,6 +26,7 @@ interface Member {
   name: string;
   isCurrentlyActive: boolean;
   seasons: Season[];
+  awards?: Award[];
 }
 
 interface MembersDirectoryProps {
@@ -37,11 +45,6 @@ function MemberCard({ member }: { member: Member }) {
   // Separate current and historical seasons
   const currentSeason = member.seasons.find(s => s.year === currentYear);
   const historicalSeasons = member.seasons.filter(s => s.year !== currentYear);
-
-  // Calculate stats from historical seasons only
-  const championships = historicalSeasons.filter(s => s.finalRank === 1).length;
-  const totalWins = historicalSeasons.reduce((sum, s) => sum + (s.wins || 0), 0);
-  const totalLosses = historicalSeasons.reduce((sum, s) => sum + (s.losses || 0), 0);
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -77,30 +80,28 @@ function MemberCard({ member }: { member: Member }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {/* Quick Stats - only from historical seasons */}
-        {historicalSeasons.length > 0 && (
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1">
-              <Trophy className="w-4 h-4 text-yellow-600" />
-              <span>{championships} championship{championships !== 1 ? 's' : ''}</span>
+        
+        {/* Awards Line - replaces championships and career stats */}
+        <div>
+          <h4 className="text-sm font-medium text-muted-foreground mb-2">Awards</h4>
+          {member.awards && member.awards.length > 0 ? (
+            <div className="flex flex-wrap gap-1 text-xl">
+              {member.awards.map((award, index) => (
+                <span 
+                  key={award.id} 
+                  title={`${award.name} (${award.season})`}
+                  className="cursor-help hover:scale-110 transition-transform"
+                >
+                  {award.icon}
+                </span>
+              ))}
             </div>
-            <div className="flex items-center gap-1">
-              <Target className="w-4 h-4 text-blue-600" />
-              <span>{totalWins}-{totalLosses} career</span>
-            </div>
-            {(() => {
-              const bestFinish = Math.min(...historicalSeasons.filter(s => s.finalRank).map(s => s.finalRank!));
-              return bestFinish !== Infinity ? (
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 flex items-center justify-center">
-                    <span className="text-xs font-bold text-green-600">🏅</span>
-                  </div>
-                  <span>#{bestFinish} best finish</span>
-                </div>
-              ) : null;
-            })()}
-          </div>
-        )}
+          ) : (
+            <p className="text-sm text-muted-foreground italic">
+              No awards yet
+            </p>
+          )}
+        </div>
 
         {/* Season Details - only historical seasons */}
         {historicalSeasons.length > 0 && (

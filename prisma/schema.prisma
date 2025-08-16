@@ -112,6 +112,9 @@ model LeagueMember {
   isCurrentlyActive Boolean    @default(false) @map("is_currently_active")
   createdAt         DateTime   @default(now()) @map("created_at")
   createdBy         String?    @map("created_by")
+  
+  // Awards won by this member
+  wonAwards         Award[]
 
   league League @relation(fields: [leagueId], references: [id])
   creator User? @relation("MemberCreatedBy", fields: [createdBy], references: [id])
@@ -154,7 +157,23 @@ model UserMemberLink {
   @@map("user_member_links")
 }
 
+model Award {
+  id          String   @id @default(cuid())
+  name        String   
+  description String?
+  icon        String   // Emoji or icon identifier
+  season      String   // Which season this award is for
+  winnerId    String?  @map("winner_id") // Which league member won this award
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  winner LeagueMember? @relation(fields: [winnerId], references: [id])
+
+  @@map("awards")
+}
+
+
 // Enums
+
 enum UserRole {
   MEMBER
   COMMISSIONER

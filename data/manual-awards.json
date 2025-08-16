@@ -1,0 +1,33 @@
+
+{
+  "manualAwards": {
+    "2024": {
+      "Best Team Name": {
+        "description": "Had the best team name as voted by the league",
+        "icon": "📝",
+        "winners": "Brian"
+      }
+    },
+    "2023": {
+      "Best Team Name": {
+        "description": "Had the best team name as voted by the league", 
+        "icon": "📝",
+        "winners": ["Jackson", "Maya"]
+      }
+    },
+    "2022": {
+      "Best Team Name": {
+        "description": "Had the best team name as voted by the league",
+        "icon": "📝", 
+        "winners": "Anisha"
+      }
+    },
+    "2018": {
+      "Founding Member": {
+        "description": "Joined the league in its inagural season",
+        "icon": "🐣", 
+        "winners": ["Tori", "Aram", "Brian", "Anisha", "Emily", "Maya", "Jackson", "Steffan", "Andrew", "Eric", "Sam"]
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+
+{
+  "awards": [
+    {
+      "name": "League Champion",
+      "description": "Won the championship game",
+      "icon": "🏆"
+    },
+    {
+      "name": "Points Leader",
+      "description": "Scored the most points this season",
+      "icon": "🥇"
+    },
+    {
+      "name": "Toilet Bowl Champion",
+      "description": "Won the toilet bowl championship game",
+      "icon": "💩"
+    }
+  ]
+}

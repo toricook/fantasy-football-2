@@ -11,6 +11,12 @@ async function getLeagueMembers() {
       include: {
         seasons: {
           orderBy: { year: 'desc' }
+        },
+        wonAwards: {
+          orderBy: [
+            { season: 'desc' },
+            { name: 'asc' }
+          ]
         }
       },
       orderBy: { displayName: 'asc' }
@@ -33,6 +39,12 @@ async function getLeagueMembers() {
           ties: season.ties,
           finalRank: season.finalRank,
           totalPoints: season.totalPoints
+        })),
+        awards: member.wonAwards.map(award => ({
+          id: award.id,
+          name: award.name,
+          icon: award.icon,
+          season: award.season
         }))
       })),
       historicalMembers: historicalMembers.map(member => ({
@@ -47,6 +59,12 @@ async function getLeagueMembers() {
           ties: season.ties,
           finalRank: season.finalRank,
           totalPoints: season.totalPoints
+        })),
+        awards: member.wonAwards.map(award => ({
+          id: award.id,
+          name: award.name,
+          icon: award.icon,
+          season: award.season
         }))
       }))
     };
