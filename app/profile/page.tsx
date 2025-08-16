@@ -5,7 +5,9 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/NavBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Crown, Heart, User, Users } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Calendar, Heart, User, Settings } from 'lucide-react';
+import Link from 'next/link';
 
 const prisma = new PrismaClient();
 
@@ -87,16 +89,26 @@ export default async function ProfilePage() {
           
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold">{displayName}</h1>
-              {isCommissioner && (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Crown className="h-3 w-3" />
-                  Commissioner
-                </Badge>
-              )}
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-3xl font-bold">{displayName}</h1>
+                  {isCommissioner && (
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      <Settings className="h-3 w-3" />
+                      Commissioner
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-muted-foreground">Your Profile</p>
+              </div>
+              <Link href="/profile/settings">
+                <Button className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Edit Profile
+                </Button>
+              </Link>
             </div>
-            <p className="text-muted-foreground">Your Profile</p>
           </div>
 
           {/* Main Profile Card */}
@@ -111,18 +123,22 @@ export default async function ProfilePage() {
               
               {/* Bio Section */}
               <div>
-                <h3 className="font-medium text-sm text-muted-foreground mb-2">Bio</h3>
+                <h3 className="font-medium text-sm text-muted-foreground mb-3">Bio</h3>
                 {user.bio ? (
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{user.bio}</p>
+                  <div className="bg-muted/60 rounded-lg p-4">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{user.bio}</p>
+                  </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground italic">
-                    You haven't written a bio yet.
-                  </p>
+                  <div className="bg-muted/20 rounded-lg p-4 border-2 border-dashed border-muted">
+                    <p className="text-sm text-muted-foreground italic text-center">
+                      No bio written yet. Click "Edit Profile" to add one!
+                    </p>
+                  </div>
                 )}
               </div>
 
-              {/* Quick Stats Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t">
+              {/* Personal Information Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t">
                 
                 {/* Birthday */}
                 <div className="flex items-center gap-3">
@@ -149,36 +165,24 @@ export default async function ProfilePage() {
                     </p>
                   </div>
                 </div>
-
-                {/* League */}
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-50 dark:bg-green-950">
-                    <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">League</p>
-                    <p className="text-sm text-muted-foreground">
-                      {user.league?.name || 'No league'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Member Since */}
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-950">
-                    <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Member Since</p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(user.joinedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long'
-                      })}
-                    </p>
-                  </div>
-                </div>
               </div>
+
+              {/* Call to action if fields are empty */}
+              {(!user.bio || !birthday || !user.favoriteTeam) && (
+                <div className="pt-4 border-t">
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Complete your profile to show more personality in the league directory!
+                    </p>
+                    <Link href="/profile/settings">
+                      <Button variant="outline" size="sm">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Complete Profile
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

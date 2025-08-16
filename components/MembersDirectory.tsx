@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Trophy, Calendar, User, Target } from "lucide-react";
+import { Users, Trophy, Calendar, User, Target, Heart } from "lucide-react";
 
 interface Award {
   id: string;
@@ -27,6 +27,9 @@ interface Member {
   isCurrentlyActive: boolean;
   seasons: Season[];
   awards?: Award[];
+  bio?: string | null;
+  birthday?: string | null;
+  favoriteTeam?: string | null;
 }
 
 interface MembersDirectoryProps {
@@ -35,53 +38,76 @@ interface MembersDirectoryProps {
 }
 
 function MemberCard({ member }: { member: Member }) {
-  const currentYear = "2025" // You can make this dynamic if needed
-  const totalSeasons = member.seasons.length;
-  const years = member.seasons.map(s => s.year).sort();
-  const yearRange = years.length > 0 ? 
-    (years.length === 1 ? years[0] : `${years[years.length - 1]}-${years[0]}`) : 
-    'No seasons';
+  const currentYear = "2025"; // You can make this dynamic if needed
 
   // Separate current and historical seasons
   const currentSeason = member.seasons.find(s => s.year === currentYear);
   const historicalSeasons = member.seasons.filter(s => s.year !== currentYear);
 
+  console.log(`Member ${member.name}:`, {
+    bio: member.bio,
+    birthday: member.birthday,
+    favoriteTeam: member.favoriteTeam
+  });
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between">
-          <span className="text-lg font-semibold">{member.name}</span>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex-1" /> {/* Spacer */}
           {member.isCurrentlyActive && (
             <Badge variant="default" className="text-xs">
               Active
             </Badge>
           )}
-        </CardTitle>
+        </div>
         
-        {/* Current Season Team Name - prominently displayed */}
+        {/* Member Name - Centered and Prominent */}
+        <div className="text-center mb-3">
+          <h2 className="text-2xl font-bold">{member.name}</h2>
+        </div>
+        
+        {/* Current Season Team Name - Centered, smaller, no box */}
         {currentSeason && currentSeason.teamName && (
-          <div className="text-center py-2">
-            <div className="text-sm text-muted-foreground mb-1">{currentYear} Season</div>
-            <div className="text-lg font-medium text-primary bg-primary/10 rounded-lg py-2 px-3">
+          <div className="text-center mb-4">
+            <div className="text-lg font-medium text-primary">
               {currentSeason.teamName}
             </div>
           </div>
         )}
         
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
-            <span>{yearRange}</span>
+        {/* Bio Box - Only show if bio exists */}
+        {member.bio && (
+          <div className="mb-4">
+            <div className="bg-muted/60 rounded-lg p-3">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {member.bio}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            <span>{totalSeasons} season{totalSeasons !== 1 ? 's' : ''}</span>
+        )}
+
+        {/* Birthday and Favorite Team - Only show if they exist */}
+        {(member.birthday || member.favoriteTeam) && (
+          <div className="space-y-1 text-sm text-muted-foreground mb-4">
+            {member.birthday && (
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>Birthday: {member.birthday}</span>
+              </div>
+            )}
+            {member.favoriteTeam && (
+              <div className="flex items-center gap-2">
+                <Heart className="w-4 h-4" />
+                <span>Favorite Team: {member.favoriteTeam}</span>
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-3">
         
-        {/* Awards Line - replaces championships and career stats */}
+        {/* Awards Line */}
         <div>
           <h4 className="text-sm font-medium text-muted-foreground mb-2">Awards</h4>
           {member.awards && member.awards.length > 0 ? (
