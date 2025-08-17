@@ -15,7 +15,6 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    displayName: "",
     leagueCode: "",
   })
   const [error, setError] = useState("")
@@ -58,7 +57,6 @@ export default function RegisterPage() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          displayName: formData.displayName,
           leagueCode: formData.leagueCode,
         }),
       })
@@ -69,7 +67,7 @@ export default function RegisterPage() {
         throw new Error(result.error || "Registration failed")
       }
 
-      setSuccess("Account created successfully! Redirecting to login...")
+      setSuccess("Account created successfully! You'll choose your league profile next. Redirecting to login...")
       setTimeout(() => {
         router.push("/login")
       }, 2000)
@@ -87,7 +85,7 @@ export default function RegisterPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Join Your League</CardTitle>
           <CardDescription>
-            Create an account to access your fantasy football league
+            Create an account to access your fantasy football league. You'll claim your league profile after registering.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -112,7 +110,7 @@ export default function RegisterPage() {
                 id="leagueCode"
                 name="leagueCode"
                 type="text"
-                placeholder="e.g. BEARS-2025-XR4K"
+                placeholder="e.g. BEARS-FF-2025"
                 value={formData.leagueCode}
                 onChange={handleInputChange}
                 required
@@ -121,20 +119,6 @@ export default function RegisterPage() {
               <p className="text-xs text-muted-foreground">
                 Get this code from your league commissioner
               </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="displayName">Display Name *</Label>
-              <Input
-                id="displayName"
-                name="displayName"
-                type="text"
-                placeholder="How you want to appear in the league"
-                value={formData.displayName}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-              />
             </div>
 
             <div className="space-y-2">

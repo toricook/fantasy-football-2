@@ -6,12 +6,12 @@ const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, displayName, leagueCode } = await request.json()
+    const { email, password, leagueCode } = await request.json()
 
     // Validate required fields
-    if (!email || !password || !displayName || !leagueCode) {
+    if (!email || !password || !leagueCode) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "Email, password, and league code are required" },
         { status: 400 }
       )
     }
@@ -51,13 +51,12 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    // Create user
+    // Create user without displayName - they'll get their name from claiming a profile
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
-        displayName,
-        name: displayName, // Also set name for NextAuth compatibility
+        name: email, // Temporary name, will be overridden when they claim a profile
         leagueId: league.id,
         isActive: true,
         role: "MEMBER",
@@ -66,11 +65,10 @@ export async function POST(request: NextRequest) {
 
     // Return success (don't send password or sensitive data)
     return NextResponse.json({
-      message: "User created successfully",
+      message: "Account created successfully! Please claim your league profile after logging in.",
       user: {
         id: user.id,
         email: user.email,
-        displayName: user.displayName,
         leagueId: user.leagueId,
       }
     })
