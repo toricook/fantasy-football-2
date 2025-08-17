@@ -16,6 +16,11 @@ const nextConfig = {
   images: {
     domains: ['cdn.sanity.io'],
   },
+  // Configure for Prisma builds
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Important: return the config
+    return config;
+  },
 };
 
 module.exports = nextConfig;
