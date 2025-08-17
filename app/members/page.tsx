@@ -10,6 +10,8 @@ export const revalidate = 60; // Cache for 60 seconds
 async function getLeagueMembers() {
   try {
     console.log('Fetching league members...');
+
+     console.log('=== MEMBERS PAGE DEBUG ===');
     
     // Use Promise.all to run queries in parallel for better performance
     const [members, awards, users] = await Promise.all([
@@ -51,6 +53,9 @@ async function getLeagueMembers() {
         }
       })
     ]);
+
+    console.log(`Raw members found: ${members.length}`);
+    console.log('Members:', members.map(m => ({ name: m.displayName, active: m.isCurrentlyActive })));
 
     console.log(`Found ${users.length} active users`);
 
