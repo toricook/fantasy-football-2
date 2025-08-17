@@ -1,9 +1,7 @@
 import { auth } from '@/lib/auth';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma'; // Use the singleton
 import { redirect } from 'next/navigation';
 import ClaimProfileForm from "@/components/ClaimProfileForm";
-
-const prisma = new PrismaClient();
 
 async function getClaimableProfiles() {
   const session = await auth();
