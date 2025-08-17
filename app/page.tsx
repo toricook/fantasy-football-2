@@ -4,6 +4,7 @@ import SmartStandings from '@/components/SmartStandings';
 import SmartMatchups from "@/components/SmartMatchups";
 import Announcements from "@/components/Announcements";
 import News from "@/components/News";
+import PlayoffPicture from "@/components/PlayoffPicture";
 import { client } from '@/lib/sanity';
 
 const leagueId = process.env.LEAGUE_ID!;
@@ -94,9 +95,17 @@ export default async function HomePage() {
             />
           </div>
 
-          {/* Middle Column - News */}
-          <div className="order-2 lg:order-2">
-            <News articles={recentNews} showViewAll={true} />
+          {/* Middle Column - News and Playoff Picture */}
+          <div className="order-2 lg:order-2 space-y-6">
+            {/* News Section */}
+            <div>
+              <News articles={recentNews} showViewAll={true} />
+            </div>
+            
+            {/* Playoff Picture Section */}
+            <div>
+              <PlayoffPicture leagueId={leagueId} />
+            </div>
           </div>
 
           {/* Right Column - Matchups */}
