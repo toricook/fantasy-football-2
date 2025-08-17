@@ -104,7 +104,10 @@ export default async function HomePage() {
             
             {/* Playoff Picture Section */}
             <div>
-              <PlayoffPicture leagueId={leagueId} />
+              <PlayoffPicture 
+                leagueId={leagueId} 
+                previousSeasonLeagueId={previousLeagueId}
+              />
             </div>
           </div>
 
