@@ -6,7 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-space-grotesk);  /* Updated to Space Grotesk */
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -45,71 +45,114 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  
+  /* Backgrounds - Clean neutral base */
+  --background: oklch(0.99 0.005 120);        /* Very light warm white */
+  --foreground: oklch(0.15 0.02 40);          /* Dark brown-gray text */
+  
+  /* Brand Colors - Football Field Theme */
+  --primary: oklch(0.35 0.15 140);            /* Deep field green */
+  --primary-foreground: oklch(0.98 0.01 120); /* Clean white text */
+  
+  /* Surface Colors */
+  --card: oklch(0.98 0.01 120);               /* Slightly warm white cards */
+  --card-foreground: oklch(0.15 0.02 40);     /* Dark text on cards */
+  --popover: oklch(0.98 0.01 120);
+  --popover-foreground: oklch(0.15 0.02 40);
+  
+  /* Secondary - Leather Brown Accent */
+  --secondary: oklch(0.45 0.08 50);           /* Rich leather brown */
+  --secondary-foreground: oklch(0.98 0.01 120);
+  
+  /* Muted Colors */
+  --muted: oklch(0.94 0.015 110);             /* Light warm gray */
+  --muted-foreground: oklch(0.45 0.02 50);    /* Medium brown-gray */
+  
+  /* Accent - Lighter Brown */
+  --accent: oklch(0.88 0.03 60);              /* Light tan/beige */
+  --accent-foreground: oklch(0.2 0.02 40);    /* Dark text on accent */
+  
+  /* Semantic Colors - Football Themed */
+  --destructive: oklch(0.55 0.22 20);         /* Penalty flag red */
+  --success: oklch(0.6 0.18 140);             /* Touchdown green */
+  --warning: oklch(0.7 0.12 70);              /* Caution yellow-brown */
+  
+  /* Borders & Inputs */
+  --border: oklch(0.88 0.02 100);             /* Soft warm border */
+  --input: oklch(0.96 0.01 120);              /* Input background */
+  --ring: oklch(0.35 0.15 140);               /* Focus ring - primary color */
+  
+  /* Chart Colors - Natural Field Palette */
+  --chart-1: oklch(0.35 0.15 140);            /* Field green */
+  --chart-2: oklch(0.45 0.08 50);             /* Leather brown */
+  --chart-3: oklch(0.6 0.18 140);             /* Success green */
+  --chart-4: oklch(0.7 0.12 70);              /* Warning brown */
+  --chart-5: oklch(0.5 0.12 200);             /* Sky blue accent */
+  
+  /* Sidebar */
+  --sidebar: oklch(0.96 0.01 120);
+  --sidebar-foreground: oklch(0.15 0.02 40);
+  --sidebar-primary: oklch(0.35 0.15 140);
+  --sidebar-primary-foreground: oklch(0.98 0.01 120);
+  --sidebar-accent: oklch(0.88 0.03 60);
+  --sidebar-accent-foreground: oklch(0.2 0.02 40);
+  --sidebar-border: oklch(0.88 0.02 100);
+  --sidebar-ring: oklch(0.35 0.15 140);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Dark Backgrounds - Rich dark field */
+  --background: oklch(0.12 0.02 140);         /* Dark green-tinted background */
+  --foreground: oklch(0.95 0.01 120);         /* Clean light text */
+  
+  /* Brand Colors - Brighter for dark mode */
+  --primary: oklch(0.5 0.18 140);             /* Brighter field green */
+  --primary-foreground: oklch(0.12 0.02 140); /* Dark background text */
+  
+  /* Surface Colors */
+  --card: oklch(0.16 0.02 130);               /* Dark warm surface */
+  --card-foreground: oklch(0.95 0.01 120);
+  --popover: oklch(0.16 0.02 130);
+  --popover-foreground: oklch(0.95 0.01 120);
+  
+  /* Secondary - Warmer brown for dark */
+  --secondary: oklch(0.4 0.1 50);             /* Rich brown */
+  --secondary-foreground: oklch(0.95 0.01 120);
+  
+  /* Muted Colors */
+  --muted: oklch(0.2 0.02 120);               /* Dark muted */
+  --muted-foreground: oklch(0.65 0.01 100);   /* Medium light gray */
+  
+  /* Accent */
+  --accent: oklch(0.25 0.03 60);              /* Dark tan */
+  --accent-foreground: oklch(0.95 0.01 120);
+  
+  /* Semantic Colors */
+  --destructive: oklch(0.65 0.2 20);          /* Brighter red for dark */
+  --success: oklch(0.7 0.16 140);             /* Brighter green */
+  --warning: oklch(0.75 0.1 70);              /* Softer warning */
+  
+  /* Borders & Inputs */
+  --border: oklch(0.25 0.02 120);             /* Dark border */
+  --input: oklch(0.18 0.02 130);              /* Input background */
+  --ring: oklch(0.5 0.18 140);                /* Focus ring */
+  
+  /* Chart Colors - Dark Mode */
+  --chart-1: oklch(0.5 0.18 140);             /* Bright green */
+  --chart-2: oklch(0.55 0.1 50);              /* Warm brown */
+  --chart-3: oklch(0.7 0.16 140);             /* Success green */
+  --chart-4: oklch(0.75 0.1 70);              /* Warning */
+  --chart-5: oklch(0.6 0.14 200);             /* Sky blue */
+  
+  /* Sidebar */
+  --sidebar: oklch(0.14 0.02 130);
+  --sidebar-foreground: oklch(0.95 0.01 120);
+  --sidebar-primary: oklch(0.5 0.18 140);
+  --sidebar-primary-foreground: oklch(0.12 0.02 140);
+  --sidebar-accent: oklch(0.25 0.03 60);
+  --sidebar-accent-foreground: oklch(0.95 0.01 120);
+  --sidebar-border: oklch(0.25 0.02 120);
+  --sidebar-ring: oklch(0.5 0.18 140);
 }
 
 @layer base {
@@ -117,6 +160,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
 }
