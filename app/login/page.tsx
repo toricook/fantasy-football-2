@@ -18,37 +18,57 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+  // Add this debug code to your login page temporarily
+// Replace the handleSubmit function with this enhanced version
 
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      })
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsLoading(true)
+  setError("")
 
-      if (result?.error) {
-        setError("Invalid email or password")
+  console.log("🔍 LOGIN DEBUG START")
+  console.log("📧 Email:", email)
+  console.log("🔑 Password length:", password.length)
+  console.log("🔑 Password:", password) // Remove this after debugging!
+
+  try {
+    console.log("📤 Calling signIn...")
+    const result = await signIn("credentials", {
+      email: email.trim(), // Remove any spaces
+      password,
+      redirect: false,
+    })
+
+    console.log("📥 SignIn result:", result)
+
+    if (result?.error) {
+      console.log("❌ SignIn error:", result.error)
+      console.log("❌ Full result object:", JSON.stringify(result, null, 2))
+      setError("Invalid email or password")
+    } else {
+      console.log("✅ SignIn success!")
+      
+      // Check if user has a league
+      const session = await getSession()
+      console.log("📋 Session after login:", session)
+      
+      if (session?.user?.leagueId) {
+        console.log("🏈 User has league, redirecting to home")
+        router.push("/")
       } else {
-        // Check if user has a league
-        const session = await getSession()
-        if (session?.user?.leagueId) {
-          router.push("/")
-        } else {
-          // User needs to join a league
-          router.push("/join-league")
-        }
+        console.log("❌ User has no league, redirecting to join-league")
+        // User needs to join a league
+        router.push("/join-league")
       }
-    } catch (err) {
-      setError("Something went wrong. Please try again.")
-    } finally {
-      setIsLoading(false)
     }
+  } catch (err) {
+    console.log("❌ Catch error:", err)
+    setError("Something went wrong. Please try again.")
+  } finally {
+    setIsLoading(false)
+    console.log("🔍 LOGIN DEBUG END")
   }
-
+}
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
