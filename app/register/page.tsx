@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react" // Add this import
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -49,6 +50,7 @@ export default function RegisterPage() {
     }
 
     try {
+      // Step 1: Register the user
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
@@ -67,10 +69,28 @@ export default function RegisterPage() {
         throw new Error(result.error || "Registration failed")
       }
 
-      setSuccess("Account created successfully! You'll choose your league profile next. Redirecting to login...")
-      setTimeout(() => {
-        router.push("/login")
-      }, 2000)
+      // Step 2: Automatically log them in
+      setSuccess("Account created successfully! Logging you in...")
+      
+      const loginResult = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (loginResult?.error) {
+        // Registration worked but login failed - redirect to login page
+        setError("Account created but login failed. Please try logging in manually.")
+        setTimeout(() => {
+          router.push("/login")
+        }, 2000)
+      } else {
+        // Success! Redirect to claim profile page
+        setSuccess("Account created and logged in successfully! Redirecting...")
+        setTimeout(() => {
+          router.push("/claim-profile")
+        }, 1500)
+      }
 
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
