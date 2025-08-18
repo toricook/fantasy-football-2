@@ -61,9 +61,8 @@ export default function ClaimProfileForm({ user, unclaimedMembers }: ClaimProfil
         throw new Error(result.error || 'Failed to claim profile');
       }
 
-      // Success! Redirect to home page
-      router.push('/');
-      router.refresh(); // Refresh to update auth state
+      // Success! Force a full page reload to refresh the session
+      window.location.href = '/';
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -71,7 +70,7 @@ export default function ClaimProfileForm({ user, unclaimedMembers }: ClaimProfil
       setLoading(false);
     }
   };
-
+  
   const selectedMember = unclaimedMembers.find(m => m.id === selectedMemberId);
 
   return (
