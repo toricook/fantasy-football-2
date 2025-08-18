@@ -7,7 +7,8 @@ const publicRoutes = [
   '/login',
   '/register',
   '/api/auth',
-  '/api/test-db'
+  '/api/test-db',
+  '/api/debug-user'
 ]
 
 // Routes that require authentication but don't require a claimed profile
