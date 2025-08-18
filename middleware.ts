@@ -8,7 +8,8 @@ const publicRoutes = [
   '/register',
   '/api/auth',
   '/api/test-db',
-  '/api/debug-user'
+  '/api/debug-members',
+  '/api/debug-user',
 ]
 
 // Routes that require authentication but don't require a claimed profile
@@ -30,50 +31,60 @@ const protectedRoutes = [
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
+  console.log(`🔍 MIDDLEWARE: ${pathname}`)
+  
   // Allow public routes
   if (publicRoutes.some(route => pathname.startsWith(route))) {
+    console.log(`✅ MIDDLEWARE: Public route allowed: ${pathname}`)
     return NextResponse.next()
   }
 
   // Check if user is authenticated
   const session = await auth()
+  console.log(`👤 MIDDLEWARE: Session check for ${pathname}:`, {
+    hasUser: !!session?.user,
+    userId: session?.user?.id,
+    leagueId: session?.user?.leagueId,
+    claimedMemberId: session?.user?.claimedMemberId,
+    claimedMemberName: session?.user?.claimedMemberName
+  })
   
   if (!session?.user) {
-    // Redirect to login if not authenticated
+    console.log(`❌ MIDDLEWARE: No session, redirecting to login`)
     const loginUrl = new URL('/login', request.url)
     return NextResponse.redirect(loginUrl)
   }
 
-  // Check if user has a league (is a league member)
+  // Check if user has a league
   if (!session.user.leagueId) {
-    // This shouldn't happen with our registration flow, but just in case
+    console.log(`❌ MIDDLEWARE: No league, redirecting to login`)
     const loginUrl = new URL('/login', request.url)
     return NextResponse.redirect(loginUrl)
   }
 
-  // Allow auth-only routes (like claim-profile) without checking for claimed profile
+  // Allow auth-only routes
   if (authOnlyRoutes.some(route => pathname.startsWith(route))) {
+    console.log(`✅ MIDDLEWARE: Auth-only route allowed: ${pathname}`)
     return NextResponse.next()
   }
 
-  // For protected routes, check if user has claimed a profile using session data
+  // For protected routes, check if user has claimed a profile
   if (protectedRoutes.some(route => pathname.startsWith(route))) {
-    // Check if user has claimed a profile (stored in session)
     const hasClaimedProfile = !!session.user.claimedMemberId
+    console.log(`🔒 MIDDLEWARE: Protected route ${pathname}, hasClaimedProfile: ${hasClaimedProfile}`)
     
     if (!hasClaimedProfile) {
-      // User needs to claim a profile first
+      console.log(`❌ MIDDLEWARE: No claimed profile, redirecting to claim-profile`)
       const claimUrl = new URL('/claim-profile', request.url)
       return NextResponse.redirect(claimUrl)
     }
   }
 
-  // User is authenticated and has claimed profile - allow access
+  console.log(`✅ MIDDLEWARE: Access granted to ${pathname}`)
   return NextResponse.next()
 }
 
 export const config = {
-  // Match all routes except static files and API routes
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.svg$).*)',
   ],

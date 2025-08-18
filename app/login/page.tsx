@@ -18,57 +18,65 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  // Add this debug code to your login page temporarily
-// Replace the handleSubmit function with this enhanced version
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setIsLoading(true)
-  setError("")
+    console.log("🔍 LOGIN ATTEMPT START")
 
-  console.log("🔍 LOGIN DEBUG START")
-  console.log("📧 Email:", email)
-  console.log("🔑 Password length:", password.length)
-  console.log("🔑 Password:", password) // Remove this after debugging!
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      })
 
-  try {
-    console.log("📤 Calling signIn...")
-    const result = await signIn("credentials", {
-      email: email.trim(), // Remove any spaces
-      password,
-      redirect: false,
-    })
+      console.log("📥 SignIn result:", result)
 
-    console.log("📥 SignIn result:", result)
-
-    if (result?.error) {
-      console.log("❌ SignIn error:", result.error)
-      console.log("❌ Full result object:", JSON.stringify(result, null, 2))
-      setError("Invalid email or password")
-    } else {
-      console.log("✅ SignIn success!")
-      
-      // Check if user has a league
-      const session = await getSession()
-      console.log("📋 Session after login:", session)
-      
-      if (session?.user?.leagueId) {
-        console.log("🏈 User has league, redirecting to home")
-        router.push("/")
+      if (result?.error) {
+        setError("Invalid email or password")
+        console.log("❌ Login failed:", result.error)
       } else {
-        console.log("❌ User has no league, redirecting to join-league")
-        // User needs to join a league
-        router.push("/join-league")
+        console.log("✅ SignIn successful, checking session...")
+        
+        // Get fresh session
+        const session = await getSession()
+        console.log("📋 Session after login:", session)
+
+        if (session?.user) {
+          console.log("👤 User data:", {
+            id: session.user.id,
+            email: session.user.email,
+            leagueId: session.user.leagueId,
+            claimedMemberId: session.user.claimedMemberId,
+            claimedMemberName: session.user.claimedMemberName
+          })
+
+          if (session.user.leagueId) {
+            if (session.user.claimedMemberId) {
+              console.log("🎯 User has claimed profile, redirecting to home")
+              router.push("/")
+            } else {
+              console.log("🎯 User needs to claim profile")
+              router.push("/claim-profile")
+            }
+          } else {
+            console.log("❌ User has no league")
+            router.push("/join-league")
+          }
+        } else {
+          console.log("❌ No user in session")
+          setError("Login failed - no session")
+        }
       }
+    } catch (err) {
+      console.log("❌ Login error:", err)
+      setError("Something went wrong. Please try again.")
+    } finally {
+      setIsLoading(false)
     }
-  } catch (err) {
-    console.log("❌ Catch error:", err)
-    setError("Something went wrong. Please try again.")
-  } finally {
-    setIsLoading(false)
-    console.log("🔍 LOGIN DEBUG END")
   }
-}
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
