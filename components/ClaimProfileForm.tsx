@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Trophy, Calendar, Users, CheckCircle, AlertCircle, User } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 
 interface Season {
   year: string;
@@ -37,40 +38,47 @@ export default function ClaimProfileForm({ user, unclaimedMembers }: ClaimProfil
   const [error, setError] = useState('');
 
   const handleClaim = async () => {
-    if (!selectedMemberId) {
-      setError('Please select a profile to claim');
-      return;
+  if (!selectedMemberId) {
+    setError('Please select a profile to claim');
+    return;
+  }
+
+  setLoading(true);
+  setError('');
+
+  try {
+    const response = await fetch('/api/claim-profile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        memberId: selectedMemberId
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to claim profile');
     }
 
-    setLoading(true);
-    setError('');
+    // Success! Force logout and back to login to refresh session
+    alert('Profile claimed successfully! Please log in again to complete the setup.');
+    
+    // Force sign out
+    await signOut({ redirect: false });
+    
+    // Redirect to login
+    window.location.href = '/login';
 
-    try {
-      const response = await fetch('/api/claim-profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          memberId: selectedMemberId
-        }),
-      });
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Something went wrong');
+  } finally {
+    setLoading(false);
+  }
+};
 
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || 'Failed to claim profile');
-      }
-
-      // Success! Force a full page reload to refresh the session
-      window.location.href = '/';
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
   const selectedMember = unclaimedMembers.find(m => m.id === selectedMemberId);
 
   return (

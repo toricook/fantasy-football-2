@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "@/lib/prisma" // Use singleton
+import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -63,44 +63,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     })
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
     async jwt({ token, user }) {
+      // Only set user data on login - don't make database calls here
+      // because this runs in Edge Runtime for middleware
       if (user) {
         token.leagueId = user.leagueId
         token.role = user.role
         token.claimedMemberId = user.claimedMemberId
         token.claimedMemberName = user.claimedMemberName
       }
+      
       return token
     },
     async session({ session, token }) {
       if (token) {
-        // Always check database for fresh claimed profile data
-        const user = await prisma.user.findUnique({
-          where: { id: token.sub! },
-          include: {
-            memberLinks: {
-              where: { status: 'APPROVED' },
-              include: { member: true }
-            }
-          }
-        })
-
-        const claimedMember = user?.memberLinks[0]?.member || null
-
         session.user.id = token.sub!
         session.user.leagueId = token.leagueId as string
         session.user.role = token.role as string
-        // Use fresh data from database
-        session.user.claimedMemberId = claimedMember?.id || null
-        session.user.claimedMemberName = claimedMember?.displayName || null
+        session.user.claimedMemberId = token.claimedMemberId as string
+        session.user.claimedMemberName = token.claimedMemberName as string
       }
       return session
     }
   },
   pages: {
     signIn: "/login"
-  }
+  },
+  trustHost: true,
 })
