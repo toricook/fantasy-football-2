@@ -4,6 +4,8 @@ import Navbar from "@/components/NavBar";
 import SeasonalNewsPage from "@/components/SeasonalNewsPage";
 import { client, type NewsArticle } from '@/lib/sanity';
 
+export const revalidate = 0;
+
 const CURRENT_SEASON = new Date().getFullYear().toString();
 
 // Define the SeasonData interface
