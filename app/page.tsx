@@ -7,6 +7,8 @@ import News from "@/components/News";
 import PlayoffPicture from "@/components/PlayoffPicture";
 import { client } from '@/lib/sanity';
 
+export const revalidate = 60;
+
 const leagueId = process.env.LEAGUE_ID!;
 const previousLeagueId = process.env.LAST_SEASON_LEAGUE_ID!;
 
