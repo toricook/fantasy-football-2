@@ -136,52 +136,59 @@ export default function ArticlePage({ article }: ArticlePageProps) {
 
               {/* Article Content */}
               <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
-                <PortableText 
-                  value={article.content}
-                  components={{
-                    block: {
-                      normal: ({children}) => <p className="mb-4">{children}</p>,
-                      h1: ({children}) => <h2 className="text-2xl font-bold mt-8 mb-4">{children}</h2>,
-                      h2: ({children}) => <h3 className="text-xl font-bold mt-6 mb-3">{children}</h3>,
-                      h3: ({children}) => <h4 className="text-lg font-semibold mt-4 mb-2">{children}</h4>,
-                      blockquote: ({children}) => (
-                        <blockquote className="border-l-4 border-primary pl-6 py-2 my-6 bg-muted/30 rounded-r-lg">
-                          <div className="italic text-muted-foreground">{children}</div>
-                        </blockquote>
-                      ),
-                    },
-                    marks: {
-                      strong: ({children}) => <strong className="font-bold">{children}</strong>,
-                      em: ({children}) => <em className="italic">{children}</em>,
-                      link: ({children, value}) => (
-                        <a 
-                          href={value.href} 
-                          className="text-primary hover:underline font-medium" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
-                          {children}
-                        </a>
-                      ),
-                    },
-                    types: {
-                      image: ({value}) => (
-                        <figure className="my-8">
-                          <img
-                            src={urlFor(value).width(800).url()}
-                            alt={value.alt || ''}
-                            className="rounded-lg shadow-md w-full"
-                          />
-                          {value.alt && (
-                            <figcaption className="text-center text-sm text-muted-foreground mt-2">
-                              {value.alt}
-                            </figcaption>
-                          )}
-                        </figure>
-                      ),
-                    },
-                  }}
-                />
+<PortableText 
+  value={article.content}
+  components={{
+    block: {
+      normal: ({children}) => <p className="mb-4">{children}</p>,
+      h1: ({children}) => <h2 className="text-2xl font-bold mt-8 mb-4">{children}</h2>,
+      h2: ({children}) => <h3 className="text-xl font-bold mt-6 mb-3">{children}</h3>,
+      h3: ({children}) => <h4 className="text-lg font-semibold mt-4 mb-2">{children}</h4>,
+      blockquote: ({children}) => (
+        <blockquote className="border-l-4 border-primary pl-6 py-2 my-6 bg-muted/30 rounded-r-lg">
+          <div className="italic text-muted-foreground">{children}</div>
+        </blockquote>
+      ),
+    },
+    list: {
+      bullet: ({children}) => (
+        <ul className="list-disc list-inside mb-4 space-y-2 ml-4">
+          {children}
+        </ul>
+      ),
+      number: ({children}) => (
+        <ol className="list-decimal list-inside mb-4 space-y-2 ml-4">
+          {children}
+        </ol>
+      ),
+    },
+    listItem: {
+      bullet: ({children}) => (
+        <li className="mb-1 leading-relaxed">{children}</li>
+      ),
+      number: ({children}) => (
+        <li className="mb-1 leading-relaxed">{children}</li>
+      ),
+    },
+    marks: {
+      strong: ({children}) => <strong className="font-bold">{children}</strong>,
+      em: ({children}) => <em className="italic">{children}</em>,
+      link: ({value, children}) => {
+        const target = (value?.href || '').startsWith('http') ? '_blank' : undefined;
+        return (
+          <a 
+            href={value?.href} 
+            target={target}
+            rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+            className="text-primary underline hover:no-underline"
+          >
+            {children}
+          </a>
+        );
+      },
+    },
+  }}
+/>
               </div>
 
               {/* Article Footer */}
