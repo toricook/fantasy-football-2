@@ -12,6 +12,7 @@ interface SmartMatchupsProps {
 interface ScoreboardMatchup {
   matchup_number: number;
   matchup_id: number;
+  status: 'upcoming' | 'in_progress' | 'complete';
   team1: {
     name: string;
     points: string;
@@ -154,7 +155,19 @@ export default function SmartMatchups({ leagueId }: SmartMatchupsProps) {
                   <Badge variant="outline" className="text-xs">
                     Matchup {matchup.matchup_number}
                   </Badge>
-                  {matchup.winner && (
+                  
+                  {/* Status badges based on game status */}
+                  {matchup.status === 'upcoming' && (
+                    <Badge variant="secondary" className="text-xs">
+                      Upcoming
+                    </Badge>
+                  )}
+                  {matchup.status === 'in_progress' && (
+                    <Badge variant="default" className="text-xs bg-blue-600">
+                      In Progress
+                    </Badge>
+                  )}
+                  {matchup.status === 'complete' && matchup.winner && (
                     <Badge 
                       variant={matchup.winner === 'tie' ? 'secondary' : 'default'} 
                       className="text-xs"
@@ -162,6 +175,11 @@ export default function SmartMatchups({ leagueId }: SmartMatchupsProps) {
                       {matchup.winner === 'tie' ? 'Tie' : 
                        matchup.winner === 'team1' ? `${matchup.team1.name} Wins` : 
                        `${matchup.team2?.name} Wins`}
+                    </Badge>
+                  )}
+                  {matchup.status === 'complete' && !matchup.winner && (
+                    <Badge variant="secondary" className="text-xs">
+                      Final
                     </Badge>
                   )}
                 </div>
