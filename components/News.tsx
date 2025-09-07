@@ -3,12 +3,45 @@
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { urlFor, type NewsArticle } from '@/lib/sanity';
-import { Calendar, ArrowRight, Newspaper } from 'lucide-react';
+import { Calendar, ArrowRight, Newspaper, User } from 'lucide-react';
+
+const categoryColors = {
+  league: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  trade: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  injury: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+  waiver: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  tips: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+  other: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
+};
 
 interface NewsProps {
   articles: NewsArticle[];
   showViewAll?: boolean;
+}
+
+// Helper function to create snippet from content
+function createSnippet(content: any, length: number = 150): string {
+  if (!content || !Array.isArray(content)) return '';
+  
+  // Extract text from Sanity's portable text format
+  const textBlocks = content
+    .filter(block => block._type === 'block' && block.children)
+    .flatMap(block => block.children)
+    .filter(child => child._type === 'span' && child.text)
+    .map(child => child.text)
+    .join(' ');
+  
+  if (textBlocks.length <= length) return textBlocks;
+  
+  // Find the last complete word before the length limit
+  const truncated = textBlocks.substring(0, length);
+  const lastSpaceIndex = truncated.lastIndexOf(' ');
+  
+  return lastSpaceIndex > 0 
+    ? truncated.substring(0, lastSpaceIndex) + '...'
+    : truncated + '...';
 }
 
 export default function News({ articles, showViewAll = true }: NewsProps) {
@@ -51,41 +84,87 @@ export default function News({ articles, showViewAll = true }: NewsProps) {
         {articles.map((article, index) => (
           <div 
             key={article._id}
-            className={`space-y-3 ${index < articles.length - 1 ? 'border-b border-border pb-4' : ''}`}
+            className={`space-y-3 ${index < articles.length - 1 ? 'pb-4 border-b' : ''}`}
           >
-            {/* Featured article (first one) gets special treatment */}
+            {/* Featured image for first article only */}
             {index === 0 && article.featuredImage && (
-              <div className="relative h-32 rounded-lg overflow-hidden">
-                <img
-                  src={urlFor(article.featuredImage).width(600).height(200).url()}
+              <div className="relative aspect-video rounded-lg overflow-hidden">
+                <img 
+                  src={urlFor(article.featuredImage).url()}
                   alt={article.featuredImage.alt || article.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <Link 
-                    href={`/news/${article.slug.current}`}
-                    className="block group"
-                  >
-                    <h3 className="font-medium text-sm leading-tight group-hover:text-primary transition-colors line-clamp-2">
-                      {article.title}
-                    </h3>
-                  </Link>
+                <div className="absolute bottom-2 left-2">
+                  <Badge className={categoryColors[article.category as keyof typeof categoryColors]}>
+                    {article.category}
+                  </Badge>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Calendar className="w-3 h-3" />
-                <time dateTime={article.publishedAt}>
-                  {new Date(article.publishedAt).toLocaleDateString()}
-                </time>
-                <span>•</span>
-                <span>{article.author}</span>
+            )}
+            
+            <div className="space-y-2">
+              {/* Title */}
+              <Link 
+                href={`/news/${article.slug.current}`}
+                className="block group"
+              >
+                <h3 className="font-medium leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                  {article.title}
+                </h3>
+              </Link>
+              
+              {/* Article snippet/excerpt */}
+              {(() => {
+                console.log('Article object keys:', Object.keys(article));
+                console.log('Article content:', article.content);
+                
+                const snippet = createSnippet(article.content, 120);
+                console.log(`Snippet for "${article.title}":`, snippet);
+                
+                return snippet ? (
+                  <div className="text-sm text-muted-foreground leading-relaxed">
+                    {snippet}
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground leading-relaxed text-red-500">
+                    [Debug: No content - Keys: {Object.keys(article).join(', ')}]
+                  </div>
+                );
+              })()}
+              
+              {/* Category badge for non-featured articles */}
+              {!(index === 0 && article.featuredImage) && (
+                <Badge 
+                  variant="secondary" 
+                  className={`text-xs ${categoryColors[article.category as keyof typeof categoryColors]}`}
+                >
+                  {article.category}
+                </Badge>
+              )}
+              
+              {/* Meta information */}
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  <time dateTime={article.publishedAt}>
+                    {new Date(article.publishedAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </time>
+                </div>
+                
+                <div className="flex items-center gap-1">
+                  <User className="w-3 h-3" />
+                  <span>{article.author}</span>
+                </div>
+                
+                <Link 
+                  href={`/news/${article.slug.current}`}
+                  className="text-primary hover:underline ml-auto"
+                >
+                  Read more →
+                </Link>
               </div>
             </div>
           </div>
