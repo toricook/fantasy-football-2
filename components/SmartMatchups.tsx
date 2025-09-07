@@ -12,7 +12,6 @@ interface SmartMatchupsProps {
 interface ScoreboardMatchup {
   matchup_number: number;
   matchup_id: number;
-  status: 'upcoming' | 'in_progress' | 'complete';
   team1: {
     name: string;
     points: string;
@@ -38,6 +37,37 @@ export default function SmartMatchups({ leagueId }: SmartMatchupsProps) {
   const [error, setError] = useState<string | null>(null);
   const [seasonInfo, setSeasonInfo] = useState<any>(null);
   const [isPreseason, setIsPreseason] = useState<boolean>(false);
+
+  // Simple function to determine matchup status
+  const getMatchupStatus = (matchup: ScoreboardMatchup) => {
+    // If there's a winner, the game is finished
+    if (matchup.winner) {
+      return {
+        status: 'final',
+        text: 'Final',
+        variant: 'default' as const
+      };
+    }
+
+    // Check if any points have been scored (game has started)
+    const team1Points = parseFloat(matchup.team1.points) || 0;
+    const team2Points = parseFloat(matchup.team2?.points || '0') || 0;
+    
+    if (team1Points > 0 || team2Points > 0) {
+      return {
+        status: 'live',
+        text: 'Live',
+        variant: 'destructive' as const
+      };
+    }
+
+    // No points scored yet, game is upcoming
+    return {
+      status: 'upcoming',
+      text: 'Upcoming',
+      variant: 'outline' as const
+    };
+  };
 
   useEffect(() => {
     async function fetchMatchupsData() {
@@ -156,32 +186,32 @@ export default function SmartMatchups({ leagueId }: SmartMatchupsProps) {
                     Matchup {matchup.matchup_number}
                   </Badge>
                   
-                  {/* Status badges based on game status */}
-                  {matchup.status === 'upcoming' && (
-                    <Badge variant="secondary" className="text-xs">
-                      Upcoming
-                    </Badge>
-                  )}
-                  {matchup.status === 'in_progress' && (
-                    <Badge variant="default" className="text-xs bg-blue-600">
-                      In Progress
-                    </Badge>
-                  )}
-                  {matchup.status === 'complete' && matchup.winner && (
-                    <Badge 
-                      variant={matchup.winner === 'tie' ? 'secondary' : 'default'} 
-                      className="text-xs"
-                    >
-                      {matchup.winner === 'tie' ? 'Tie' : 
-                       matchup.winner === 'team1' ? `${matchup.team1.name} Wins` : 
-                       `${matchup.team2?.name} Wins`}
-                    </Badge>
-                  )}
-                  {matchup.status === 'complete' && !matchup.winner && (
-                    <Badge variant="secondary" className="text-xs">
-                      Final
-                    </Badge>
-                  )}
+                  <div className="flex gap-2">
+                    {/* Game Status Badge */}
+                    {(() => {
+                      const statusInfo = getMatchupStatus(matchup);
+                      return (
+                        <Badge 
+                          variant={statusInfo.variant}
+                          className="text-xs"
+                        >
+                          {statusInfo.text}
+                        </Badge>
+                      );
+                    })()}
+                    
+                    {/* Winner Badge - only show if there's a winner */}
+                    {matchup.winner && (
+                      <Badge 
+                        variant={matchup.winner === 'tie' ? 'secondary' : 'default'} 
+                        className="text-xs"
+                      >
+                        {matchup.winner === 'tie' ? 'Tie' : 
+                         matchup.winner === 'team1' ? `${matchup.team1.name} Wins` : 
+                         `${matchup.team2?.name} Wins`}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-3">
