@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
+    "prebuild": "npm update sleeper-api-client --force",
     "build": "prisma generate && next build",
-    "build:vercel": "npm install sleeper-api-client@github:toricook/sleeper-api-client --force && next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
