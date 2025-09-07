@@ -1,5 +1,7 @@
+import type { NextConfig } from 'next'
+
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   // Disable ESLint during builds (quick fix for deployment)
   eslint: {
     ignoreDuringBuilds: true,
@@ -16,9 +18,11 @@ const nextConfig = {
   images: {
     domains: ['cdn.sanity.io'],
   },
-  // Configure for Prisma builds
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    // Important: return the config
+  webpack: (config, { dev }) => {
+    // Only apply webpack config when NOT using turbopack
+    if (dev && !process.env.TURBOPACK) {
+      config.cache = false;
+    }
     return config;
   },
 };
