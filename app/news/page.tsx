@@ -3,6 +3,8 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/NavBar";
 import SeasonalNewsPage from "@/components/SeasonalNewsPage";
 import { client, type NewsArticle } from '@/lib/sanity';
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
 export const revalidate = 0;
 
@@ -32,14 +34,6 @@ async function getCurrentSeasonNews(): Promise<NewsArticle[]> {
       }
     `, { season: CURRENT_SEASON })
     
-    console.log('=== CURRENT SEASON NEWS FETCH ===');
-    console.log('Season:', CURRENT_SEASON);
-    console.log('Count:', news.length);
-    console.log('Articles:', news.map((article: NewsArticle) => ({ 
-      title: article.title, 
-      category: article.category,
-      season: (article as any).season 
-    })));
     return news;
   } catch (error) {
     console.error('Error fetching current season news:', error);
@@ -70,9 +64,6 @@ async function getAvailableSeasons(): Promise<SeasonData[]> {
       }))
       .sort((a, b) => parseInt(b.season) - parseInt(a.season));
 
-    console.log('=== AVAILABLE SEASONS ===');
-    console.log('Seasons:', seasonData);
-    
     return seasonData;
   } catch (error) {
     console.error('Error fetching available seasons:', error);
@@ -81,6 +72,21 @@ async function getAvailableSeasons(): Promise<SeasonData[]> {
 }
 
 export default async function NewsPageRoute() {
+
+  const session = await auth()
+  
+  if (!session?.user) {
+    redirect('/login')
+  }
+  
+  if (!session?.user?.leagueId) {
+    redirect('/login')
+  }
+  
+  if (!session?.user?.claimedMemberId) {
+    redirect('/claim-profile')
+  }
+
   const [currentSeasonNews, seasons] = await Promise.all([
     getCurrentSeasonNews(),
     getAvailableSeasons()

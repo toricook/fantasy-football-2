@@ -6,6 +6,9 @@ import Announcements from "@/components/Announcements";
 import News from "@/components/News";
 import PlayoffPicture from "@/components/PlayoffPicture";
 import { client } from '@/lib/sanity';
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
+
 
 export const revalidate = 60;
 
@@ -24,9 +27,6 @@ async function getAnnouncements() {
         expiresAt
       }
     `)
-    console.log('=== ANNOUNCEMENTS FETCH ===');
-    console.log('Count:', announcements.length);
-    console.log('Data:', announcements);
     return announcements;
   } catch (error) {
     console.error('Error fetching announcements:', error);
@@ -51,10 +51,6 @@ async function getRecentNews() {
       }
     `, { currentSeason })
     
-    console.log('=== CURRENT SEASON NEWS FETCH ===');
-    console.log('Season:', currentSeason);
-    console.log('Count:', news.length);
-    console.log('Data:', news);
     return news;
   } catch (error) {
     console.error('Error fetching current season news:', error);
@@ -63,17 +59,21 @@ async function getRecentNews() {
 }
 
 export default async function HomePage() {
-  console.log('=== HOMEPAGE SERVER RENDER ===');
-  console.log('Fetching content...');
+
+  const session = await auth()
+  
+  if (!session?.user?.leagueId) {
+    redirect('/login')
+  }
+  
+  if (!session?.user?.claimedMemberId) {
+    redirect('/claim-profile')
+  }
 
   const [announcements, recentNews] = await Promise.all([
     getAnnouncements(),
     getRecentNews()
   ]);
-
-  console.log('=== FINAL RESULTS ===');
-  console.log('Announcements:', announcements.length);
-  console.log('News articles:', recentNews.length);
 
   return (
     <div className="min-h-screen bg-background">

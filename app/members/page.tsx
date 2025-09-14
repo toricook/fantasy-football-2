@@ -2,6 +2,8 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/NavBar";
 import MembersDirectory from "@/components/MembersDirectory";
 import { prisma } from "@/lib/prisma"; // Use singleton client
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
 // Add timeout and performance settings
 export const dynamic = 'force-dynamic';
@@ -9,10 +11,6 @@ export const revalidate = 60; // Cache for 60 seconds
 
 async function getLeagueMembers() {
   try {
-    console.log('Fetching league members...');
-
-     console.log('=== MEMBERS PAGE DEBUG ===');
-    
     // Use Promise.all to run queries in parallel for better performance
     const [members, awards, users] = await Promise.all([
       // Get members
@@ -53,11 +51,6 @@ async function getLeagueMembers() {
         }
       })
     ]);
-
-    console.log(`Raw members found: ${members.length}`);
-    console.log('Members:', members.map(m => ({ name: m.displayName, active: m.isCurrentlyActive })));
-
-    console.log(`Found ${users.length} active users`);
 
     // Create a map of member ID to user profile
     const memberToUserMap = new Map();
@@ -124,8 +117,6 @@ async function getLeagueMembers() {
     const currentMembers = members.filter(member => member.isCurrentlyActive).map(mapMember);
     const historicalMembers = members.filter(member => !member.isCurrentlyActive).map(mapMember);
 
-    console.log(`Returning ${currentMembers.length} current and ${historicalMembers.length} historical members`);
-
     return {
       currentMembers,
       historicalMembers
@@ -138,6 +129,20 @@ async function getLeagueMembers() {
 }
 
 export default async function MembersPage() {
+  const session = await auth()
+  
+  if (!session?.user) {
+    redirect('/login')
+  }
+  
+  if (!session?.user?.leagueId) {
+    redirect('/login')
+  }
+  
+  if (!session?.user?.claimedMemberId) {
+    redirect('/claim-profile')
+  }
+
   const { currentMembers, historicalMembers } = await getLeagueMembers();
 
   return (

@@ -145,7 +145,7 @@ export default function SmartStandings({ leagueId, previousSeasonLeagueId }: Sma
                 </div>
                 <div>
                   <div className="font-medium text-sm">
-                    {team.user?.display_name || team.user?.metadata?.team_name || 'Unknown'}
+                    {team.user?.metadata.team_name || team.user?.metadata?.display_name || 'Unknown'}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {team.settings.wins}-{team.settings.losses}

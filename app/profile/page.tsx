@@ -66,6 +66,21 @@ async function getCurrentUser() {
 }
 
 export default async function ProfilePage() {
+ const session = await auth()
+  
+  if (!session?.user) {
+    redirect('/login')
+  }
+  
+  if (!session?.user?.leagueId) {
+    redirect('/login')
+  }
+  
+  if (!session?.user?.claimedMemberId) {
+    redirect('/claim-profile')
+  }
+
+
   const user = await getCurrentUser();
   
   // displayName is now the claimed member name

@@ -2,6 +2,8 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/NavBar";
 import ArchiveDisplay from "@/components/ArchiveDisplay";
 import { prisma } from "@/lib/prisma";
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
 // Add performance settings
 export const dynamic = 'force-dynamic';
@@ -211,6 +213,21 @@ async function getArchiveData(): Promise<YearlyData[]> {
 }
 
 export default async function ArchivePage() {
+
+  const session = await auth()
+  
+  if (!session?.user) {
+    redirect('/login')
+  }
+  
+  if (!session?.user?.leagueId) {
+    redirect('/login')
+  }
+  
+  if (!session?.user?.claimedMemberId) {
+    redirect('/claim-profile')
+  }
+
   const archiveData = await getArchiveData();
 
   console.log('Archive data being passed to component:', JSON.stringify(archiveData, null, 2));
