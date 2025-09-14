@@ -32,7 +32,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sanity": "^4.3.0",
-    "sleeper-api-client": "github:toricook/sleeper-api-client",
+    "sleeper-api-client": "github:toricook/sleeper-api-client#main",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1"
   },
