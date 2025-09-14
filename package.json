@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
+    "prebuild": "npm update sleeper-api-client --force",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",

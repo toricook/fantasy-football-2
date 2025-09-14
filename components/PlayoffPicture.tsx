@@ -658,7 +658,7 @@ export default function PlayoffPicture({ leagueId, previousSeasonLeagueId }: Pla
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="overflow-auto max-h-[calc(50vh-80px)] space-y-6">
+      <CardContent className="overflow-auto space-y-6">
         {/* Section 1: Playoff Bracket */}
         <div>
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
