@@ -115,11 +115,8 @@ export default function News({ articles, showViewAll = true }: NewsProps) {
               
               {/* Article snippet/excerpt */}
               {(() => {
-                console.log('Article object keys:', Object.keys(article));
-                console.log('Article content:', article.content);
                 
                 const snippet = createSnippet(article.content, 120);
-                console.log(`Snippet for "${article.title}":`, snippet);
                 
                 return snippet ? (
                   <div className="text-sm text-muted-foreground leading-relaxed">
@@ -131,16 +128,6 @@ export default function News({ articles, showViewAll = true }: NewsProps) {
                   </div>
                 );
               })()}
-              
-              {/* Category badge for non-featured articles */}
-              {!(index === 0 && article.featuredImage) && (
-                <Badge 
-                  variant="secondary" 
-                  className={`text-xs ${categoryColors[article.category as keyof typeof categoryColors]}`}
-                >
-                  {article.category}
-                </Badge>
-              )}
               
               {/* Meta information */}
               <div className="flex items-center gap-3 text-xs text-muted-foreground">

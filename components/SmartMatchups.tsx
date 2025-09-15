@@ -190,6 +190,7 @@ export default function SmartMatchups({ leagueId }: SmartMatchupsProps) {
                     {/* Game Status Badge */}
                     {(() => {
                       const statusInfo = getMatchupStatus(matchup);
+                      console.log(statusInfo)
                       return (
                         <Badge 
                           variant={statusInfo.variant}
@@ -200,17 +201,6 @@ export default function SmartMatchups({ leagueId }: SmartMatchupsProps) {
                       );
                     })()}
                     
-                    {/* Winner Badge - only show if there's a winner */}
-                    {matchup.winner && (
-                      <Badge 
-                        variant={matchup.winner === 'tie' ? 'secondary' : 'default'} 
-                        className="text-xs"
-                      >
-                        {matchup.winner === 'tie' ? 'Tie' : 
-                         matchup.winner === 'team1' ? `${matchup.team1.name} Wins` : 
-                         `${matchup.team2?.name} Wins`}
-                      </Badge>
-                    )}
                   </div>
                 </div>
 
@@ -222,9 +212,9 @@ export default function SmartMatchups({ leagueId }: SmartMatchupsProps) {
                     'bg-muted/20'
                   }`}>
                     <div>
-                      <div className="font-medium text-sm">{matchup.team1.name}</div>
+                      <div className="font-medium text-sm">{matchup.team1.user?.metadata?.team_name}</div>
                       <div className="text-xs text-muted-foreground">
-                        {matchup.team1.user?.username || 'Unknown'}
+                        {matchup.team1.user?.display_name || 'Unknown'}
                       </div>
                     </div>
                     <div className="text-right">
@@ -246,9 +236,9 @@ export default function SmartMatchups({ leagueId }: SmartMatchupsProps) {
                       'bg-muted/20'
                     }`}>
                       <div>
-                        <div className="font-medium text-sm">{matchup.team2.name}</div>
+                        <div className="font-medium text-sm">{matchup.team2.user?.metadata?.team_name}</div>
                         <div className="text-xs text-muted-foreground">
-                          {matchup.team2.user?.username || 'Unknown'}
+                          {matchup.team2.user?.display_name || 'Unknown'}
                         </div>
                       </div>
                       <div className="text-right">
